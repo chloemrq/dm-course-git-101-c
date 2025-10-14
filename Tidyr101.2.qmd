@@ -52,3 +52,18 @@ ggplot(EuStockMarkets, aes(y=CAC, x=date)) +
   geom_line(mapping=aes(y=DAX), colour="darkred")
 ```
 
+### Tidyr solution 
+
+```{r}
+EuStockMarkets |> 
+  pivot_longer(!date, names_to = "index") |> # excluding date, becomes the way to identify the object
+  slice_head(n=10)
+```
+
+```{r}
+EuStockMarkets |> 
+  pivot_longer(!date, names_to = "index") |>
+  ggplot(aes(x=date, y=value, color=index)) +
+  geom_line()
+```
+
