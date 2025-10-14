@@ -1,0 +1,28 @@
+---
+title: "Tidyr101.2"
+author: "CM"
+format: html
+editor: visual
+---
+
+```{r}
+here::i_am("dm-course-git-101-c.Rproj")
+library(here)
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+data("EuStockMarkets")
+```
+
+## Dsiplaying one time series 
+```{r}
+ggplot(EuStockMarkets, aes(y=DAX, x=time(EuStockMarkets))) +
+  geom_line()
+```
+
