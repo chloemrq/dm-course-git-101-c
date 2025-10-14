@@ -20,9 +20,35 @@ library(tidyr)
 data("EuStockMarkets")
 ```
 
-## Dsiplaying one time series 
+## Displaying one time series 
 ```{r}
 ggplot(EuStockMarkets, aes(y=DAX, x=time(EuStockMarkets))) +
   geom_line()
+```
+```{r}
+EuStockMarkets <- 
+  EuStockMarkets |> 
+    as_tibble() |> # could be as.data.frame
+    mutate(date = as.numeric(time(EuStockMarkets))) # tibble to convert it to dataframe 
+```
+
+```{r}
+ggplot(EuStockMarkets, aes(y=DAX, x=date)) +
+  geom_line()
+```
+
+```{r}
+ggplot(EuStockMarkets, aes(y=CAC, x=date)) +
+  geom_line()
+```
+
+## Two indexes on the same graphical representation 
+
+### Poor man's solution 
+
+```{r}
+ggplot(EuStockMarkets, aes(y=CAC, x=date)) +
+  geom_line(color= "steelblue") +
+  geom_line(mapping=aes(y=DAX), colour="darkred")
 ```
 
