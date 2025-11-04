@@ -68,4 +68,37 @@ all_stars <- right_join(planets, stars, by=join_by(star_key))
 all_all <- full_join(planets, stars, by=join_by(star_key))
 ```
 
+### Star oriented analysis
+If a star does not appear in the planet data frame, this means that this star has no associated habitable planets. We want to compute the distribution of the average number of habitable planets per star. 
+Here we are missing the stars without planets. 
+
+```{r}
+planet_star |>
+  summarise(n=n(), .by=star_key) |>
+  ggplot(aes(x=n)) + 
+  geom_bar()
+```
+
+```{r}
+all_stars |>
+  summarise(n=n(), .by=star_key) |>
+  ggplot(aes(x=n)) + 
+  geom_bar()
+```
+
+```{r}
+all_stars |>
+  summarise(n=sum(!is.na(planet_key)), .by=star_key) |>
+  ggplot(aes(x=n)) +
+    geom_bar()
+```
+
+Different solution : 
+
+```{r}
+all_stars |>
+  summarise(n=n_distinct(planet_key, na.rm=TRUE), .by=star_key) |>
+  ggplot(aes(x=n)) +
+    geom_bar()
+```
 
