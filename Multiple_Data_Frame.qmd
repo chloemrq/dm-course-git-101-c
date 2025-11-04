@@ -1,0 +1,45 @@
+---
+title: "Multiple Data Frames"
+author: "Chloé Marquis"
+format: html
+---
+
+```{r}
+here::i_am("dm-course-git-101-c.Rproj")
+library(here)
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(vroom)
+```
+
+```{r}
+planets <- vroom(here("data", "Planets.csv"))
+stars <- vroom(here("data", "thestars.csv"))
+```
+```{r}
+sun_to_earth <- 333000
+```
+
+
+# Planet oriented analysis 
+
+We look for the planet that has the largest ratio between its mass and the mass of its star. We cannot do that using the planets date frame only, we need to join it with the stars data frame. 
+
+### Inner Join
+
+In an inner join, we keep only matches between the two data frames (according to the join_by variables). 
+```{r}
+planet_star <- inner_join(planets, stars, by = join_by(star_key))
+```
+
+```{r}
+planet_star |>
+  mutate(mass_ratio = MASS/(`Relative Mass`*sun_to_earth)) |>
+  slice_max(mass_ratio)|>
+  select(planet=p_name, star=STAR, mass_ratio)
+```
+
