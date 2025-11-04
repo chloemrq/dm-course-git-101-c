@@ -20,11 +20,13 @@ library(tidyr)
 data("EuStockMarkets")
 ```
 
-## Displaying one time series 
+## Displaying one time series
+
 ```{r}
 ggplot(EuStockMarkets, aes(y=DAX, x=time(EuStockMarkets))) +
   geom_line()
 ```
+
 ```{r}
 EuStockMarkets <- 
   EuStockMarkets |> 
@@ -42,9 +44,9 @@ ggplot(EuStockMarkets, aes(y=CAC, x=date)) +
   geom_line()
 ```
 
-## Two indexes on the same graphical representation 
+## Two indexes on the same graphical representation
 
-### Poor man's solution 
+### Poor man's solution
 
 ```{r}
 ggplot(EuStockMarkets, aes(y=CAC, x=date)) +
@@ -52,7 +54,7 @@ ggplot(EuStockMarkets, aes(y=CAC, x=date)) +
   geom_line(mapping=aes(y=DAX), colour="darkred")
 ```
 
-### Tidyr solution 
+### Tidyr solution
 
 ```{r}
 EuStockMarkets |> 
@@ -67,3 +69,83 @@ EuStockMarkets |>
   geom_line()
 ```
 
+```{r}
+EuStockMarkets |>
+  pivot_longer(everything()) |>
+  slice_head(n=10) |>
+  knitr::kable()
+```
+
+```{r}
+EuStockMarkets |>
+  pivot_longer(DAX | SMI) |>
+  slice_head(n=10) |>
+  knitr::kable()
+```
+
+If we pivot on an index then we can go back to the original data. here this is not the case.
+
+### Working on rows with pivoting
+
+```{r}
+EuStockMarkets |>
+  select(!FTSE) |> # we don't want to select FTSE
+  pivot_longer(!date) |> # pivot over everything except the date 
+  summarise(avg_stock = mean(value), .by = date) |> # here this is the global mean per date 
+  slice_head(n=10) |>
+  knitr::kable()
+```
+
+### Alternative with 'rowwise'
+
+```{r}
+EuStockMarkets |>
+  select(!FTSE) |>
+  rowwise() |>
+  summarise(date, avg_stock = mean(DAX, CAC, SMI)) |>
+  knitr::kable()
+```
+
+## Reverse operation : pivot to a wider format
+
+```{r}
+Eulong <- 
+  EuStockMarkets |>
+    pivot_longer(!date)
+```
+
+```{r}
+Eulong |>
+  pivot_wider() |>
+  slice_head(n=10) |>
+  knitr::kable()
+```
+
+```{r}
+Eulong |>
+  pivot_wider(id_cols=date)|>
+  slice_head(n=10) |>
+  knitr::kable()
+```
+
+```{r}
+data('diamonds')
+dgroup <-
+  diamonds |>
+  summarise(count=n(), median_price = median(price), .by=c(cut, color))
+```
+
+```{r}
+dgroup |>
+  select(!count) |>
+  pivot_wider(id_cols = cut, names_from=color, values_from = median_price)
+```
+
+Missing data support
+
+```{r}
+set.seed(42)
+dgroup |>
+  slice_sample(n=25) |># different value each i run this 
+  pivot_wider(id_cols = cut, names_from=color, values_from = count)
+```
