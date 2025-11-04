@@ -43,3 +43,29 @@ planet_star |>
   select(planet=p_name, star=STAR, mass_ratio)
 ```
 
+### Semi and anti join 
+
+```{r}
+planet_without_star <- anti_join(planets, stars, by = join_by(star_key))
+stars_without_planet <- anti_join(stars, planets, by = join_by(star_key))
+```
+
+```{r}
+stars_with_planets <- semi_join(stars, planets, by = join_by(star_key)) 
+```
+
+-> stars with at least one planet in the data frame 
+We have `r nrow(planets_without_star)` planets without a corresponding star in the datebase and `r nrow(stars_without_planet)` stars without planets described in the database.
+
+### Left and right join 
+Keep the planets even if they don't have a corresponding star -> use an outer join. 
+Left join : keep all data from first param even if they don't have a match in the second param 
+Full join will keep everything.
+
+```{r}
+all_planets <- left_join(planets, stars, by=join_by(star_key))
+all_stars <- right_join(planets, stars, by=join_by(star_key))
+all_all <- full_join(planets, stars, by=join_by(star_key))
+```
+
+
